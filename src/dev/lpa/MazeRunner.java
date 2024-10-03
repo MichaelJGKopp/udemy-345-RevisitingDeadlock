@@ -1,6 +1,10 @@
 package dev.lpa;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 record Participant(String name, String searchingFor, Maze maze, int[] startingPosition) {
 
@@ -41,7 +45,6 @@ class ParticipantThread extends Thread {
         Thread.currentThread().interrupt(); // to properly interrupt and return
         return;
       }
-
       System.out.println(participant.name() + " is searching " + participant.maze());
     }
   }
@@ -56,5 +59,22 @@ public class MazeRunner {
     Participant grace = new Participant("Grace", "Adam", maze, new int[]{1, 1});
 
     System.out.println(maze);
+
+    var executor = Executors.newCachedThreadPool();
+    var adamsResult = executor.submit(new ParticipantThread(adam));
+//    var gracesResult = executor.submit(new ParticipantThread(grace));
+
+    executor.shutdown();
+
+    try {
+      System.out.println("Adam result: " + adamsResult.get(10, TimeUnit.SECONDS));
+//      System.out.println("Grace result: " + gracesResult.get(10, TimeUnit.SECONDS));
+
+      if(executor.awaitTermination(10, TimeUnit.SECONDS)) {
+        executor.shutdownNow();
+      }
+    } catch (InterruptedException | TimeoutException | ExecutionException e) {
+      e.printStackTrace();
+    }
   }
 }
