@@ -31,15 +31,15 @@ class ParticipantThread extends Thread {
     while (true) {
       int[] newSpot = maze.getNextLocation(lastSpot);
       try {
-        Thread.sleep(500);
+        Thread.sleep(participant.name().equals("Grace") ? 2900 : 500);
         if (maze.searchCell(participant.searchingFor(), newSpot, lastSpot)) {
           System.out.printf("%s found %s at %s!%n", participant.name(), participant.searchingFor(),
             Arrays.toString(newSpot));
           break;
         }
-//        synchronized (maze) {
+        synchronized (maze) {
           maze.moveLocation(newSpot[0], newSpot[1], participant.name());
-//        }
+        }
         lastSpot = new int[]{newSpot[0], newSpot[1]};
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt(); // to properly interrupt and return
