@@ -1,10 +1,7 @@
 package dev.lpa;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 record Participant(String name, String searchingFor, Maze maze, int[] startingPosition) {
 
@@ -78,15 +75,15 @@ public class MazeRunner {
     }
     executor.shutdown();
 
-    try {
-      System.out.println("Adam result: " + adamsResult.get(10, TimeUnit.SECONDS));
-      System.out.println("Grace result: " + gracesResult.get(10, TimeUnit.SECONDS));
-
-      if(executor.awaitTermination(10, TimeUnit.SECONDS)) {
-        executor.shutdownNow();
-      }
-    } catch (InterruptedException | TimeoutException | ExecutionException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      System.out.println("Adam result: " + adamsResult.get(10, TimeUnit.SECONDS));
+//      System.out.println("Grace result: " + gracesResult.get(10, TimeUnit.SECONDS));
+//
+//      if(executor.awaitTermination(10, TimeUnit.SECONDS)) {
+//        executor.shutdownNow();
+//      }
+//    } catch (InterruptedException | TimeoutException | ExecutionException e) {
+//      e.printStackTrace();
+//    }
   }
 }
