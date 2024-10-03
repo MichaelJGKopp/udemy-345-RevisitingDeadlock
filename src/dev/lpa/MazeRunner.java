@@ -37,9 +37,9 @@ class ParticipantThread extends Thread {
             Arrays.toString(newSpot));
           break;
         }
-        synchronized (maze) {
+//        synchronized (maze) {
           maze.moveLocation(newSpot[0], newSpot[1], participant.name());
-        }
+//        }
         lastSpot = new int[]{newSpot[0], newSpot[1]};
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt(); // to properly interrupt and return
@@ -62,13 +62,25 @@ public class MazeRunner {
 
     var executor = Executors.newCachedThreadPool();
     var adamsResult = executor.submit(new ParticipantThread(adam));
-//    var gracesResult = executor.submit(new ParticipantThread(grace));
+    var gracesResult = executor.submit(new ParticipantThread(grace));
 
+    while (!adamsResult.isDone() && !gracesResult.isDone()) {
+      try {
+        Thread.sleep(1_000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    if (adamsResult.isDone()) {
+      gracesResult.cancel(true);
+    } else if (gracesResult.isDone()) {
+      adamsResult.cancel(true);
+    }
     executor.shutdown();
 
     try {
       System.out.println("Adam result: " + adamsResult.get(10, TimeUnit.SECONDS));
-//      System.out.println("Grace result: " + gracesResult.get(10, TimeUnit.SECONDS));
+      System.out.println("Grace result: " + gracesResult.get(10, TimeUnit.SECONDS));
 
       if(executor.awaitTermination(10, TimeUnit.SECONDS)) {
         executor.shutdownNow();
